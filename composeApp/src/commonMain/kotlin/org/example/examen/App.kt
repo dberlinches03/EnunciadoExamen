@@ -2,104 +2,88 @@ package org.example.examen
 
 import ScreenInscripcion
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import org.jetbrains.compose.resources.painterResource
-
 import enunciadoexamen.composeapp.generated.resources.Res
 import enunciadoexamen.composeapp.generated.resources.logoE
 import org.example.examen.models.Persona
-import org.example.examen.ui.screen.Pantallas
-import org.example.examen.ui.screen.ScreenBienvenida
-import org.example.examen.ui.theme.BlueDeep
+import org.example.examen.ui.screen.ScreenSolicitudes
+
+// Colores oficiales del enunciado
+val BlueDeep = Color(0xFF1C2751)
+val BlueDark = Color(0xFF344C92)
+val GreenGray = Color(0xFF8A9586)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview
-fun AppEmpleo() {
+fun App() {
     val navController = rememberNavController()
-
     val listaPersonas = remember { mutableStateListOf<Persona>() }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {Text ("App Empleo") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = BlueDeep,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
-                ),
+                title = { Text("App Empleo", color = Color.White) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = BlueDeep),
                 navigationIcon = {
                     Image(
                         painter = painterResource(Res.drawable.logoE),
-                        contentDescription = "Logo Empleo",
-                        modifier = Modifier.size(40.dp).padding(8.dp)
+                        contentDescription = "Logo",
+                        modifier = Modifier.size(50.dp).padding(8.dp)
                     )
                 }
             )
         },
         bottomBar = {
-            NavigationBar (containerColor = Color.White) {
+            NavigationBar {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
-                Pantallas.values().forEach { pantallas ->
+                val pantallas = listOf("Bienvenida", "Inscripcion", "Solicitudes", "Ayuda")
+                pantallas.forEach { route ->
                     NavigationBarItem(
-                        icon = { /* Aquí podrías poner iconos según la pantalla */ },
-                        label = { Text(pantallas.titulo)},
-                        selected = currentRoute == pantallas.name,
-                        onClick = {
-                            navController.navigate(pantallas.name) {
-                                // Evita acumular pantallas en la pila
-                                popUpTo(navController.graph.startDestinationId)
-                                launchSingleTop = true
-                            }
-                        }
+                        label = { Text(route) },
+                        selected = currentRoute == route,
+                        onClick = { navController.navigate(route) {
+                            popUpTo(navController.graph.startDestinationId)
+                            launchSingleTop = true
+                        }},
+                        icon = { Icon(Icons.Default.List, contentDescription = null) }
                     )
                 }
             }
         }
-    ) { innerPadding ->
-        // Contenedor de navegación (NavHost)
-        NavHost(
-            navController = navController,
-            startDestination = Pantallas.Bienvenida.name,
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            composable(Pantallas.Bienvenida.name) { 
-                ScreenBienvenida(navController)
+    ) { padding ->
+        NavHost(navController, "Bienvenida", Modifier.padding(padding)) {
+            composable("Bienvenida") { ScreenBienvenida() }
+            composable("Inscripcion") {
+                ScreenInscripcion(onGuardar = { listaPersonas.add(it) })
             }
-            composable(Pantallas.Inscripcion.name) {
-                ScreenInscripcion(onPersonaGuardada = {nuevaPersona ->
-                    listaPersonas.add(nuevaPersona)
-                    navController.navigate(Pantallas.Solicitudes.name)
-                })
+            composable("Solicitudes") {
+                ScreenSolicitudes(listaPersonas, onBorrar = { listaPersonas.remove(it) })
             }
-            composable(Pantallas.Solicitudes.name) {
-                ScreenSolicitudes(
-                    listaPersonas = listaPersonas,
-                    onDelete = { persona -> listaPersonas.remove(persona)}
-                )
-            }
-            composable(Pantallas.Ayuda.name) {
-                // ScreenAyuda()
-            }
+            composable("Ayuda") { ScreenAyuda() }
         }
+    }
+}
+
+@Composable
+fun ScreenBienvenida() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(painter = painterResource(Res.drawable.logoE), contentDescription = null, modifier = Modifier.size(150.dp))
+        Text("Bienvenido a Empleo", style = MaterialTheme.typography.headlineMedium)
     }
 }
