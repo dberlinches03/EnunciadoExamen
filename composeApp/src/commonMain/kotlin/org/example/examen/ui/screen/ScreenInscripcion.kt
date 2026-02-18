@@ -1,4 +1,4 @@
-package org.example.examen
+package org.example.examen.ui.screen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
