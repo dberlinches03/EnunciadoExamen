@@ -44,7 +44,7 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(compose.materialIconsExtended)
-            implementation(libs.compose.icons.extended)
+            implementation(libs.material.icons.extended)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

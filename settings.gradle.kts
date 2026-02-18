@@ -11,6 +11,7 @@ pluginManagement {
             }
         }
         mavenCentral()
+        maven("https://maven.pkh.jetbrains.tools/kotlin/public")
         gradlePluginPortal()
     }
 }
@@ -25,6 +26,7 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
+        maven("https://maven.pkh.jetbrains.tools/kotlin/public")
     }
 }
 
